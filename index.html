@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgical Semiology 3 Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Khmer', 'Open Sans', sans-serif;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1.6;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .selected {
+            background-color: #e0e7ff !important;
+            border-color: #6366f1 !important;
+            color: #3730a3;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+        }
+        .incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        .question-nav-btn {
+            transition: all 0.2s ease-in-out;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .question-nav-btn.active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .question-nav-btn.answered-correct {
+            background-color: #bfdbfe;
+            border-color: #60a5fa;
+            color: #1e40af;
+        }
+        .question-nav-btn.answered-incorrect {
+            background-color: #fecaca;
+            border-color: #f87171;
+            color: #991b1b;
+        }
+        .question-nav-btn:hover:not(.active) {
+            background-color: #f3f4f6;
+        }
+        .edit-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+        .edit-label {
+            font-weight: 500;
+            color: #374151;
+            margin-top: 12px;
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+
+    <div id="quiz-container" class="quiz-container w-full">
+        
+        <div class="text-center mb-8 relative">
+            <h1 class="text-3xl font-bold text-gray-800">Surgical Semiology 3</h1>
+            <p id="quiz-subtitle" class="text-gray-500 mt-2">Subject: Comprehensive Exam (Prof: Yok Ratan)</p>
+            <div class="absolute top-0 left-0 flex gap-2">
+                <button id="practice-sheet-btn" class="bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded-lg hover:bg-blue-200 text-sm">Practice Sheet</button>
+                <button id="show-all-btn" class="bg-green-100 text-green-700 font-semibold py-2 px-4 rounded-lg hover:bg-green-200 text-sm">Show Answers</button>
+            </div>
+            <button id="edit-quiz-btn" class="absolute top-0 right-0 bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 text-sm">Edit Quiz</button>
+        </div>
+
+        <div class="text-center mb-6">
+            <div class="inline-flex rounded-md shadow-sm flex-wrap justify-center" role="group">
+                <button id="part1-btn" type="button" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 rounded-l-lg border border-gray-200 hover:bg-indigo-700 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 1</button>
+                <button id="part2-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 2</button>
+                <button id="part3-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 3</button>
+                <button id="part4-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 4</button>
+                <button id="part5-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 5</button>
+                <button id="part6-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 6</button>
+                <button id="part7-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 7</button>
+                <button id="part8-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-r rounded-r-lg border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 8</button>
+            </div>
+        </div>
+
+        <div id="quiz-view">
+            <div class="flex justify-between items-center mb-4">
+                 <div id="main-score-text" class="text-lg font-bold text-indigo-600"></div>
+                 <button id="redo-part-btn" class="bg-orange-100 text-orange-700 font-semibold py-2 px-4 rounded-lg hover:bg-orange-200 text-sm">Redo Part</button>
+            </div>
+            <div id="question-navigation" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+
+            <div id="question-area" class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="question-number" class="text-xl font-semibold text-gray-700"></h2>
+                </div>
+                <div id="question-text" class="text-lg text-gray-800 leading-relaxed font-medium"></div>
+            </div>
+
+            <div id="answer-area"></div>
+            <div id="feedback-area" class="mt-6 text-center text-lg font-medium"></div>
+
+            <div class="mt-6 text-center">
+                <button id="redo-btn" class="hidden bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-yellow-600 transition-colors duration-300 shadow-lg">
+                    Redo Question
+                </button>
+            </div>
+
+            <div class="mt-4 flex justify-between items-center">
+                <button id="prev-btn" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-600 transition-colors duration-300 shadow-lg hidden">
+                    <span class="font-semibold">&larr; Previous</span>
+                </button>
+                <button id="next-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg hidden ml-auto">
+                    <span class="font-semibold">Next Question</span>
+                </button>
+            </div>
+
+            <div id="results-area" class="hidden text-center">
+                <div class="mb-4">
+                    <h2 class="text-4xl font-extrabold text-gray-800">Quiz Complete!</h2>
+                </div>
+                <p id="results-score" class="text-2xl text-gray-600 mb-6"></p>
+                <div id="summary" class="text-left mt-8 bg-gray-50 p-6 rounded-lg">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-gray-700">Review Your Answers:</h3>
+                    </div>
+                </div>
+                <button id="restart-btn" class="mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg">
+                    <span class="font-semibold">Play Again</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="practice-sheet-view" class="hidden"></div>
+        <div id="all-questions-view" class="hidden"></div>
+
+        <div id="edit-view" class="hidden">
+            <h2 class="text-2xl font-bold text-center mb-6">Edit Quiz Questions</h2>
+            <div id="edit-question-navigation" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+            <div id="edit-questions-container"></div>
+            <div class="flex justify-between items-start mt-8">
+                <button id="add-question-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">Add Question</button>
+                <div>
+                    <button id="cancel-edit-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 mr-4">Cancel</button>
+                    <button id="apply-preview-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700">Apply to Preview</button>
+                    <button id="generate-save-code-btn" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 ml-4">Generate Save Code</button>
+                </div>
+            </div>
+            <div id="export-area" class="hidden mt-6 p-4 border-2 border-dashed border-purple-400 rounded-lg bg-purple-50">
+                <h3 class="text-lg font-semibold text-purple-800">How to Save Your Changes Permanently</h3>
+                <ol class="list-decimal list-inside text-gray-700 space-y-2 mt-2">
+                    <li>All the code for your updated quiz is in the text box below.</li>
+                    <li>Click anywhere in the box to automatically copy all the code.</li>
+                    <li>Paste the copied code in a new message and send it to me.</li>
+                    <li>I will then update the file for you with your permanent changes.</li>
+                </ol>
+                <textarea id="export-output" readonly class="w-full h-64 p-2 border rounded-md bg-gray-100 font-mono text-sm focus:ring-2 focus:ring-indigo-500 mt-4 cursor-pointer"></textarea>
+                <p id="copy-feedback" class="text-purple-700 font-medium text-sm mt-2 h-4"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        let quizDataPart1 = [
+            { number: 1, type: "mcq", question: { en: "1. Causes of chest injury for blunt trauma: (Choose the correct answers)" }, options: { en: ["A. Falls", "B. Stab wounds", "C. Blast injuries", "D. Gunshot wounds", "E. Motor vehicle accidents"] }, answer: { en: ["A. Falls", "C. Blast injuries", "E. Motor vehicle accidents"] } },
+            { number: 2, type: "mcq", question: { en: "2. Causes of chest injury for penetrating trauma: (Choose the correct answers)" }, options: { en: ["A. Falls", "B. Stab wounds", "C. Blast injuries", "D. Gunshot wounds", "E. Shrapnel wounds"] }, answer: { en: ["B. Stab wounds", "D. Gunshot wounds", "E. Shrapnel wounds"] } },
+            { number: 3, type: "mcq", question: { en: "3. How many percentages of isolated liver injury that occurs in patients?" }, options: { en: ["A. 33%", "B. 45%", "C. 50%", "D. 60%"] }, answer: { en: ["C. 50%"] } },
+            { number: 4, type: "mcq", question: { en: "4. What are the Traumatic/Tension Pneumothorax? (Choose the correct answers)" }, options: { en: ["A. Primary spontaneous pneumothorax", "B. Pulmonary source", "C. Tracheobronchial source", "D. Primary spontaneous pneumothorax (repeat)", "E. Esophageal source"] }, answer: { en: ["B. Pulmonary source", "C. Tracheobronchial source", "E. Esophageal source"] } },
+            { number: 5, type: "mcq", question: { en: "5. What are the factors that compromise the exam of Abdominal Injury? (Choose the correct answers)" }, options: { en: ["A. Alcohol and other drugs", "B. Scratch", "C. Injury to legs", "D. Injury to the brain, spinal cord", "E. Injury to ribs, spine, pelvis"] }, answer: { en: ["A. Alcohol and other drugs", "D. Injury to the brain, spinal cord", "E. Injury to ribs, spine, pelvis"] } },
+            { number: 6, type: "mcq", question: { en: "6. What are the investigation methods for Abdominal Trauma in haemodynamically stable patient? (Choose the correct answers)" }, options: { en: ["A. Full blood count and haematocrit", "B. MCHC", "C. Enzymology", "D. Urea and Electrolytes", "E. Focused Abdominal Sonography for Trauma"] }, answer: { en: ["A. Full blood count and haematocrit", "D. Urea and Electrolytes", "E. Focused Abdominal Sonography for Trauma"] } },
+            { number: 7, type: "mcq", question: { en: "7. What are the disadvantages of Focused Abdominal Sonography for Trauma? (Choose the correct answers)" }, options: { en: ["A. Operator dependent", "B. Retroperitoneal structures are not visualized", "C. Cannot assess hollow visceral perforation", "D. Non-invasive", "E. No risk from contrast media or radiation"] }, answer: { en: ["A. Operator dependent", "B. Retroperitoneal structures are not visualized", "C. Cannot assess hollow visceral perforation"] } },
+            { number: 8, type: "mcq", question: { en: "8. What are the advantages of Focused Abdominal Sonography for Trauma? (Choose the correct answers)" }, options: { en: ["A. Operator dependent", "B. Retroperitoneal structures are not visualized", "C. Cannot assess hollow visceral perforation", "D. Non-invasive", "E. No risk from contrast media or radiation"] }, answer: { en: ["D. Non-invasive", "E. No risk from contrast media or radiation"] } },
+            { number: 9, type: "mcq", question: { en: "9. What are the four view techniques of Focused Abdominal Sonography for Trauma? (Choose the correct answers)" }, options: { en: ["A. Morrison’s pouch", "B. Douglas pouch", "C. Epigastric", "D. Right upper quadrant", "E. Left upper quadrant"] }, answer: { en: ["A. Morrison’s pouch", "B. Douglas pouch", "C. Epigastric", "E. Left upper quadrant"] } },
+            { number: 10, type: "mcq", question: { en: "10. Sometimes the herniated loop of intestine becomes partially obstructed, producing variable symptoms that may include: (Choose the correct answers)" }, options: { en: ["A. Tenderness", "B. Abdominal distension", "C. Anorexia", "D. Irritability", "E. Strangulation and gangrene"] }, answer: { en: ["A. Tenderness", "B. Abdominal distension", "C. Anorexia", "D. Irritability"] } },
+            { number: 11, type: "mcq", question: { en: "11. Squamous cell carcinoma are: (Choose the correct answers)" }, options: { en: ["A. More common in males", "B. Most occur centrally in the large bronchi", "C. Can occur in non-smokers", "D. Associated with smoking", "E. Early metastasis occurs to the kidney, liver organs as well as the adrenal glands"] }, answer: { en: ["A. More common in males", "B. Most occur centrally in the large bronchi", "D. Associated with smoking"] } },
+            { number: 12, type: "mcq", question: { en: "12. There are two types of signs and symptoms of lung cancer, what are they? (Choose the correct answers)" }, options: { en: ["A. Localized – involving the lung", "B. Localized – involved other areas throughout the body if the cancer has spread", "C. Generalized – involving the lung", "D. Generalized – involves other areas throughout the body if the cancer has spread"] }, answer: { en: ["A. Localized – involving the lung", "D. Generalized – involves other areas throughout the body if the cancer has spread"] } },
+            { number: 13, type: "mcq", question: { en: "13. What are the late signs and symptoms of Lung Cancer? (Choose the correct answers)" }, options: { en: ["A. Head and neck edema", "B. Chest/shoulder pain", "C. Hemoptysis", "D. Dysphagia", "E. Dyspnea"] }, answer: { en: ["A. Head and neck edema", "D. Dysphagia"] } }
+        ];
+
+        let quizDataPart2 = [
+            { number: 1, type: "mcq", question: { en: "14. Which ones are not signs and symptoms of the Esophageal Cancer? (Choose the correct answers)" }, options: { en: ["A. Dysphagia", "B. Always feel dizzy", "C. Weight loss without trying", "D. Can’t sleep at night", "E. Chest pain, pressure or burning"] }, answer: { en: ["B. Always feel dizzy", "D. Can’t sleep at night"] } },
+            { number: 2, type: "mcq", question: { en: "15. What are the signs and symptoms of sucking chest wound? (Choose the correct answers)" }, options: { en: ["A. Difficulty breathing", "B. Normal breathing", "C. Blunt chest trauma", "D. Impaled object in chest", "E. Pain in chest or shoulder"] }, answer: { en: ["A. Difficulty breathing", "D. Impaled object in chest", "E. Pain in chest or shoulder"] } },
+            { number: 3, type: "mcq", question: { en: "16. What are the managements of sucking chest wound? (Choose the correct answers)" }, options: { en: ["A. Cover wound completely and tape down 3 sides to provide flutter-type valve for air escape", "B. Medical treatment", "C. Cover wound completely without chest tube", "D. Seal the wound with airtight material, covering the larger wound first.", "E. May use Asherman chest seal"] }, answer: { en: ["A. Cover wound completely and tape down 3 sides to provide flutter-type valve for air escape", "D. Seal the wound with airtight material, covering the larger wound first.", "E. May use Asherman chest seal"] } },
+            { number: 4, type: "mcq", question: { en: "17. What are the signs and symptoms of spleen injury? (Choose the correct answers)" }, options: { en: ["A. Blood pressure high", "B. Blood pressure low", "C. KEHR’s sign-pain in the left shoulder", "D. Difficult to breath", "E. Pale skin"] }, answer: { en: ["B. Blood pressure low", "C. KEHR’s sign-pain in the left shoulder", "E. Pale skin"] } },
+            { number: 5, type: "mcq", question: { en: "18. What are the generalized signs and symptoms of lung cancer? (Choose the correct answers)" }, options: { en: ["A. Change in phlegm", "B. Abdominal pain, elevated liver function tests, enlarged liver, jaundice, hepatomegaly", "C. Pancoats syndrome", "D. Headaches, mental status changes or neurologic findings", "E. Pleural effusion"] }, answer: { en: ["B. Abdominal pain, elevated liver function tests, enlarged liver, jaundice, hepatomegaly", "D. Headaches, mental status changes or neurologic findings"] } },
+            { number: 6, type: "mcq", question: { en: "19. What are the early signs and symptoms of lung cancer? (Choose the correct answers)" }, options: { en: ["A. Dyspnea", "B. Chest pain/tightness", "C. Head and neck edema", "D. Blurred vision, headaches", "E. Recurring respiratory infections"] }, answer: { en: ["A. Dyspnea", "E. Recurring respiratory infections"] } },
+            { number: 7, type: "mcq", question: { en: "20. What are the late signs and symptoms of lung cancer? (Choose the correct answers)" }, options: { en: ["A. Dysphagia", "B. Hemoptysis", "C. Recurring respiratory infections", "D. Bone pain, spinal cord compression", "E. Pleural effusion"] }, answer: { en: ["A. Dysphagia", "D. Bone pain, spinal cord compression", "E. Pleural effusion"] } },
+            { number: 8, type: "mcq", question: { en: "21. What are the side effects of chemotherapy treatments of lung cancer? (Choose the correct answers)" }, options: { en: ["A. Pain", "B. Alopecia, SOB", "C. Tingling", "D. Irritable", "E. Decreased hematopoietic function"] }, answer: { en: ["B. Alopecia, SOB", "C. Tingling", "D. Irritable"] } },
+            { number: 9, type: "mcq", question: { en: "22. Which ones are the criteria of inoperability of Esophegeal Cancer? (Choose the correct answers)" }, options: { en: ["A. Unfit patient", "B. Presence of distant metastases", "C. Unrespectable tumor", "D. Respectable tumor", "E. Infiltration of important structure as trachea, aorta"] }, answer: { en: ["A. Unfit patient", "B. Presence of distant metastases", "C. Unrespectable tumor", "E. Infiltration of important structure as trachea, aorta"] } },
+            { number: 10, type: "mcq", question: { en: "23. Inguinal swelling appears quickly when the infant: (Choose the correct answers)" }, options: { en: ["A. Take a rest", "B. Cry", "C. Strain", "D. Cough", "E. Walk for a long period"] }, answer: { en: ["B. Cry", "C. Strain", "D. Cough"] } },
+            { number: 11, type: "mcq", question: { en: "24. What are the signs and symptoms of Generalized of the lung cancer? (Choose the correct answers)" }, options: { en: ["A. Bone pain", "B. Headaches, mental status changes or neurologic findings", "C. Weight loss", "D. Generalized – involves other areas spread", "E. Change in phlegm"] }, answer: { en: ["A. Bone pain", "B. Headaches, mental status changes or neurologic findings", "C. Weight loss"] } },
+            { number: 12, type: "mcq", question: { en: "25. What are the early signs and symptoms of Lung Cancer? (Choose the correct answers)" }, options: { en: ["A. Head and neck edema", "B. Chest/shoulder pain", "C. Hemoptysis", "D. Dysphagia", "E. Dyspnea"] }, answer: { en: ["B. Chest/shoulder pain", "C. Hemoptysis", "E. Dyspnea"] } }
+        ];
+
+        let quizDataPart3 = [
+            { number: 1, type: "mcq", question: { en: "26. What is the peak incidence Abdominal Trauma?" }, options: { en: ["A. 10 – 30 years", "B. 15 – 30 years", "C. 20 – 30 years", "D. 25 – 30 years"] }, answer: { en: ["B. 15 – 30 years"] } },
+            { number: 2, type: "mcq", question: { en: "27. What is the first management of Abdominal Trauma?" }, options: { en: ["A. Principle of ABC", "B. Initial assessment and resuscitation. Establish that an abdominal injury exists rather than emphasis on exact diagnosis.", "C. Initial examination and resuscitation should be simultaneous.", "D. Initial fluid resuscitation; rapid infusion of 2 litres of crystalloid solution"] }, answer: { en: ["B. Initial assessment and resuscitation. Establish that an abdominal injury exists rather than emphasis on exact diagnosis."] } },
+            { number: 3, type: "mcq", question: { en: "28. Which organ is the most vulnerable abdominal organ to blunt injury because of its size and location?" }, options: { en: ["A. Lung", "B. Spleen", "C. Liver", "D. Bowel"] }, answer: { en: ["C. Liver"] } },
+            { number: 4, type: "mcq", question: { en: "29. Which organ is the commonest injured organ in blunt abdominal trauma?" }, options: { en: ["A. Lung", "B. Spleen", "C. Liver", "D. Bowel"] }, answer: { en: ["B. Spleen"] } },
+            { number: 5, type: "mcq", question: { en: "30. Which organ is the small intestines takes up a large part of the abdomen and is likely to be damaged in penetrating injury?" }, options: { en: ["A. Lung", "B. Spleen", "C. Liver", "D. Bowel"] }, answer: { en: ["D. Bowel"] } },
+            { number: 6, type: "mcq", question: { en: "31. What are the physical examination of clinical finding in spontaneous pneumothorax? (Choose the correct answers)" }, options: { en: ["A. Tympanic percussion note", "B. Absent breath sounds", "C. Trachea deviated to the side of the collapse if there is total lung collapse", "D. Duskiness percussion note"] }, answer: { en: ["A. Tympanic percussion note", "B. Absent breath sounds", "C. Trachea deviated to the side of the collapse if there is total lung collapse"] } },
+            { number: 7, type: "mcq", question: { en: "32. Low-velocity penetrating injury are: (Choose the correct answers)" }, options: { en: ["A. burst injuries with distant contusions", "B. parenchymal disruption.", "C. Stab wounds", "D. Percutaneous biopsy", "E. Cholangiography"] }, answer: { en: ["C. Stab wounds", "D. Percutaneous biopsy", "E. Cholangiography"] } },
+            { number: 8, type: "mcq", question: { en: "33. Cyanosis is the signs and symptoms of the: (Choose the correct answers)" }, options: { en: ["A. Sucking chest wounds", "B. Flail chest", "C. Rib fracture", "D. Tension pneumothorax", "E. Hemothorax"] }, answer: { en: ["D. Tension pneumothorax", "E. Hemothorax"] } },
+            { number: 9, type: "mcq", question: { en: "34. Blood accumulation in chest cavity is considered as: (Choose the correct answer)" }, options: { en: ["A. Sucking chest wounds", "B. Hemothorax", "C. Flail chest", "D. Tension pneumothorax"] }, answer: { en: ["B. Hemothorax"] } },
+            { number: 10, type: "mcq", question: { en: "35. What are the signs and symptoms of tension pneumothorax? (Choose the correct answers)" }, options: { en: ["A. Difficulty breathing", "B. Chest pain", "C. Unilateral decreased", "D. Normal breathing", "E. Bilateral decreased"] }, answer: { en: ["A. Difficulty breathing", "B. Chest pain", "C. Unilateral decreased"] } },
+            { number: 11, type: "mcq", question: { en: "36. What are the signs and symptoms of tension pneumothorax? (Choose the correct answers)" }, options: { en: ["A. Increased pulse", "B. Decreased pulse", "C. Jugular venous distention", "D. Tracheal deviation", "E. Without tracheal deviation"] }, answer: { en: ["A. Increased pulse", "C. Jugular venous distention", "D. Tracheal deviation"] } },
+            { number: 12, type: "mcq", question: { en: "37. What are the treatments of Hemothorax? (Choose the correct answers)" }, options: { en: ["A. Cover and dress open chest wounds", "B. If massive hemothorax, treated with IV fluids for shock", "C. Immediate evacuation to surgical assets.", "D. Not neccessary for evacuation to surgical assets.", "E. Medical treatment"] }, answer: { en: ["A. Cover and dress open chest wounds", "B. If massive hemothorax, treated with IV fluids for shock", "C. Immediate evacuation to surgical assets."] } },
+            { number: 13, type: "mcq", question: { en: "38. What are the signs and symptoms of flail chest? (Choose the correct answers)" }, options: { en: ["A. Minimal pain at site", "B. Normal breathing", "C. Severe pain at site", "D. Rapid shallow breathing", "E. Paradoxical respirations"] }, answer: { en: ["C. Severe pain at site", "D. Rapid shallow breathing", "E. Paradoxical respirations"] } },
+            { number: 14, type: "mcq", question: { en: "39. What are the signs and symptoms of esophageal cancer? (Choose the correct answers)" }, options: { en: ["A. Dysphagia", "B. Weight loss without trying", "C. Worsening indigestion are the signs and symptoms of liver cancer.", "D. Without dysphagia", "E. Gain weight"] }, answer: { en: ["A. Dysphagia", "B. Weight loss without trying", "C. Worsening indigestion are the signs and symptoms of liver cancer."] } },
+            { number: 15, type: "mcq", question: { en: "40. What should you assess before transferring a patient to OR? (Choose the correct answers)" }, options: { en: ["A. Penetrating injury", "B. Patient is unstable", "C. Patient is stable", "D. Bleeding is associated with hilar injury"] }, answer: { en: ["A. Penetrating injury", "B. Patient is unstable", "D. Bleeding is associated with hilar injury"] } }
+        ];
+
+        let quizDataPart4 = [
+            { number: 1, type: "mcq", question: { en: "Section 2: 1. Which ones are the criteria of inoperability of Esophegeal Cancer? (Choose the correct answers)" }, options: { en: ["A. Unfit patient", "B. Presence of distant metastases", "C. Unrespectable tumor", "D. Respectable tumor", "E. Infiltration of important structure as trachea, aorta"] }, answer: { en: ["A. Unfit patient", "B. Presence of distant metastases", "C. Unrespectable tumor", "E. Infiltration of important structure as trachea, aorta"] } },
+            { number: 2, type: "mcq", question: { en: "Section 2: 3. Inguinal swelling appears quickly when the infant: (Choose the correct answers)" }, options: { en: ["A. Take a rest", "B. Cry", "C. Strain", "D. Cough", "E. Walk for a long period"] }, answer: { en: ["B. Cry", "C. Strain", "D. Cough"] } },
+            { number: 3, type: "mcq", question: { en: "Section 2: 4. What are the signs and symptoms of Generalized of the lung cancer? (Choose the correct answers)" }, options: { en: ["A. Bone pain", "B. Headaches, mental status changes or neurologic findings", "C. Weight loss", "D. Generalized – involves other areas spread", "E. Change in phlegm"] }, answer: { en: ["A. Bone pain", "B. Headaches, mental status changes or neurologic findings", "C. Weight loss", "D. Generalized – involves other areas throughout the body if the cancer has spread"] } },
+            { number: 4, type: "mcq", question: { en: "Section 2: 5. What are the early signs and symptoms of Lung Cancer? (Choose the correct answers)" }, options: { en: ["A. Head and neck edema", "B. Chest/shoulder pain", "C. Hemoptysis", "D. Dysphagia", "E. Dyspnea"] }, answer: { en: ["B. Chest/shoulder pain", "C. Hemoptysis", "E. Dyspnea"] } },
+            { number: 5, type: "mcq", question: { en: "Section 2: 6. What is the peak incidence Abdominal Trauma? (Choose the correct answer)" }, options: { en: ["A. 10 – 30 years", "B. 15 – 30 years", "C. 20 – 30 years", "D. 25 – 30 years"] }, answer: { en: ["B. 15 – 30 years"] } },
+            { number: 6, type: "mcq", question: { en: "Section 2: 8. What is the first management of Abdominal Trauma? (Choose the correct answer)" }, options: { en: ["A. Principle of ABC", "B. Initial assessment and resuscitation. Establish that an abdominal injury exists rather than emphasis on exact diagnosis", "C. Initial examination and resuscitation should be simultaneous", "D. Initial fluid resuscitation; rapid infusion of 2 litres of crystalloid solution"] }, answer: { en: ["B. Initial assessment and resuscitation. Establish that an abdominal injury exists rather than emphasis on exact diagnosis"] } },
+            { number: 7, type: "mcq", question: { en: "Section 2: 9. Which organ is the most vulnerable abdominal organ to blunt injury because of its size and location? (Choose the correct answer)" }, options: { en: ["A. Lung", "B. Spleen", "C. Liver", "D. Bowel"] }, answer: { en: ["C. Liver"] } },
+            { number: 8, type: "mcq", question: { en: "Section 2: 10. Which organ is the commonest injured organ in blunt abdominal trauma? (Choose the correct answer)" }, options: { en: ["A. Lung", "B. Spleen", "C. Liver", "D. Bowel"] }, answer: { en: ["B. Spleen"] } },
+            { number: 9, type: "mcq", question: { en: "Section 2: 11. Which organ is the small intestines takes up a large part of the abdomen and is likely to be damaged in penetrating injury? (Choose the correct answer)" }, options: { en: ["A. Lung", "B. Spleen", "C. Liver", "D. Bowel"] }, answer: { en: ["D. Bowel"] } },
+            { number: 10, type: "mcq", question: { en: "Section 2: 12. What are the physical examination of clinical finding in spontaneous pneumothorax? (Choose the correct answers)" }, options: { en: ["A. Tympanic percussion note", "B. Absent breath sounds", "C. Trachea deviated to the side of the collapse if there is total lung collapse", "D. Duskiness percussion note"] }, answer: { en: ["A. Tympanic percussion note", "B. Absent breath sounds", "C. Trachea deviated to the side of the collapse if there is total lung collapse"] } },
+            { number: 11, type: "mcq", question: { en: "Section 2: 13. Low-velocity penetrating injury are: (Choose the correct answers)" }, options: { en: ["A. burst injuries with distant contusions", "B. parenchymal disruption.", "C. Stab wounds", "D. Percutaneous biopsy", "E. Cholangiography"] }, answer: { en: ["C. Stab wounds", "D. Percutaneous biopsy", "E. Cholangiography"] } },
+            { number: 12, type: "mcq", question: { en: "Section 2: 14. Cyanosis is the signs and symptoms of the: (Choose the correct answers)" }, options: { en: ["A. Sucking chest wounds", "B. Flail chest", "C. Rib fracture", "D. Tension pneumothorax", "E. Hemothorax"] }, answer: { en: ["D. Tension pneumothorax", "E. Hemothorax"] } },
+            { number: 13, type: "mcq", question: { en: "Section 2: 15. Blood accumulation in chest cavity is considered as: (Choose the correct answer)" }, options: { en: ["A. Sucking chest wounds", "B. Hemothorax", "C. Flail chest", "D. Tension pneumothorax"] }, answer: { en: ["B. Hemothorax"] } },
+            { number: 14, type: "mcq", question: { en: "Section 2: 16. What are the signs and symptoms of tension pneumothorax ? (Choose the correct answers)" }, options: { en: ["A. Difficulty breathing", "B. Chest pain", "C. Unilateral decreased", "D. Normal breathing", "E. Bilateral decreased"] }, answer: { en: ["A. Difficulty breathing", "B. Chest pain", "C. Unilateral decreased"] } },
+            { number: 15, type: "mcq", question: { en: "Section 2: 17. What are the signs and symptoms of tension pneumothorax ? (Choose the correct answers)" }, options: { en: ["A. Increased pulse", "B. Decreased pulse", "C. Jugular venous distention", "D. Tracheal deviation", "E. Without tracheal deviation"] }, answer: { en: ["A. Increased pulse", "C. Jugular venous distention", "D. Tracheal deviation"] } },
+            { number: 16, type: "mcq", question: { en: "Section 2: 18. What are the treatments of Hemothorax ? (Choose the correct answers)" }, options: { en: ["A. Cover and dress open chest wounds", "B. If massive hemothorax, treated with IV fluids for shock", "C. Immediate evacuation to surgical assets.", "D. Not neccessary for evacuation to surgical assets.", "E. Medical treatment"] }, answer: { en: ["A. Cover and dress open chest wounds", "B. If massive hemothorax, treated with IV fluids for shock", "C. Immediate evacuation to surgical assets."] } },
+            { number: 17, type: "mcq", question: { en: "Section 2: 19. What are the signs and symptoms of flail chest ? (Choose the correct answers)" }, options: { en: ["A. Minimal pain at site", "B. Normal breathing", "C. Severe pain at site", "D. Rapid shallow breathing", "E. Paradoxical respirations"] }, answer: { en: ["C. Severe pain at site", "D. Rapid shallow breathing", "E. Paradoxical respirations"] } },
+            { number: 18, type: "mcq", question: { en: "Section 2: 20. What are the signs and symptoms of esophageal cancer ? Choose the correct answers" }, options: { en: ["A. Dysphagia", "B. Weight loss without trying", "C. Worsening indigestion are the signs and symptoms of liver cancer.", "D. Without dysphagia", "E. Gain weight"] }, answer: { en: ["A. Dysphagia", "B. Weight loss without trying", "C. Worsening indigestion are the signs and symptoms of liver cancer."] } },
+            { number: 19, type: "mcq", question: { en: "Section 2: 21. Adenocacinoma is easily seen on a CXR and can occur in non-smokers." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 20, type: "mcq", question: { en: "Section 2: 22. Heartburn and dysphagia are the signs and symptoms of esophageal cancer." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } }
+        ];
+
+        let quizDataPart5 = [
+            { number: 1, type: "mcq", question: { en: "Section 2: 23. Adenocacinoma is highly metastatic in nature. (Affected areas)" }, options: { en: ["A. Brain", "B. Liver", "C. Bone", "D. Prostate", "E. Penis and testicle"] }, answer: { en: ["A. Brain", "B. Liver", "C. Bone"] } },
+            { number: 2, type: "mcq", question: { en: "Section 2: 24. Large cell carcinoma Tends to occur in the outer part of lung, invading sub-segmental bronchi or larger airways and poorly differentiated cells." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 3, type: "mcq", question: { en: "Section 2: 25. There are two types of signs and symptoms of lung cancer :" }, options: { en: ["A. Localize – involving the lung", "B. Generalized – involves other areas throughout the body if the cancer has spread"] }, answer: { en: ["A. Localize – involving the lung", "B. Generalized – involves other areas throughout the body if the cancer has spread"] } },
+            { number: 4, type: "mcq", question: { en: "Section 2: 26. What are the localized signs and symptoms of lung cancer ?" }, options: { en: ["A. Change in phlegm", "B. Abdominal pain, elevated liver tests", "C. Pancoats syndrome", "D. Headaches, mental status changes", "E. Pleural effusion"] }, answer: { en: ["A. Change in phlegm", "C. Pancoats syndrome", "E. Pleural effusion"] } },
+            { number: 5, type: "mcq", question: { en: "Section 2: 27. What are the localized signs and symptoms of lung cancer ?" }, options: { en: ["A. Chest pain and tightness", "B. Horner’s syndrome", "C. Superior Vena Cava syndrome", "D. Bone pain", "E. Headaches"] }, answer: { en: ["A. Chest pain and tightness", "B. Horner’s syndrome", "C. Superior Vena Cava syndrome"] } },
+            { number: 6, type: "mcq", question: { en: "Section 2: 28. What are the late signs and symptoms of lung cancer ?" }, options: { en: ["A. Dysphagia", "B. Chest pain/tightness", "C. Head and neck edema", "D. Blurred vision, headaches", "E. Hemoptysis"] }, answer: { en: ["A. Dysphagia", "C. Head and neck edema"] } },
+            { number: 7, type: "mcq", question: { en: "Section 2: 29. What are the late signs and symptoms of lung cancer ?" }, options: { en: ["A. Bone pain, spinal cord compression", "B. Dysphagia", "C. Liver metastasis/regional spread", "D. Chest/shoulder pain", "E. Recurring respiratory infections"] }, answer: { en: ["A. Bone pain, spinal cord compression", "B. Dysphagia", "C. Liver metastasis/regional spread"] } },
+            { number: 8, type: "mcq", question: { en: "Section 2: 30. Surgery, radition therapy and chemotherapy are the three main treatements of lung cancer." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 9, type: "mcq", question: { en: "Section 2: 31. What are the side effects of surgery treatments of lung cancer ?" }, options: { en: ["A. Pain", "B. Hematomas", "C. Hemmorhage", "D. Fatique", "E. Risk for Pneumonitis"] }, answer: { en: ["A. Pain", "B. Hematomas", "C. Hemmorhage"] } },
+            { number: 10, type: "mcq", question: { en: "Section 2: 32. What are the side effects of radiation treatments of lung cancer ?" }, options: { en: ["A. Pain", "B. Hemotomas", "C. Hemmorhage", "D. Fatique", "E. Risk for Pneumonitis, esophagitis, cough"] }, answer: { en: ["D. Fatique", "E. Risk for Pneumonitis, esophagitis, cough"] } },
+            { number: 11, type: "mcq", question: { en: "Section 2: 33. Shallow breathing is one of the signs and symptoms of rib fracture." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 12, type: "mcq", question: { en: "Section 2: 34. How rib fracture is treated ?" }, options: { en: ["A. Do not wear a rib belt or binder.", "B. Drink plenty of water", "C. Apply warm water 3-4 times daily", "D. Apply an ice pack 3-4 times daily", "E. Avoid constipation"] }, answer: { en: ["A. Do not wear a rib belt or binder.", "D. Apply an ice pack 3-4 times daily", "E. Avoid constipation"] } },
+            { number: 13, type: "mcq", question: { en: "Section 2: 35. What are complications of rib fracture ?" }, options: { en: ["A. Prolonged pain", "B. Slow healing", "C. Dyphasia", "D. Ruptured lung"] }, answer: { en: ["A. Prolonged pain", "B. Slow healing", "D. Ruptured lung"] } },
+            { number: 14, type: "mcq", question: { en: "Section 3: 1. Causes of chest injury for blunt trauma: (Choose correct answers)" }, options: { en: ["A. Falls", "B. Stab wounds", "C. Blast injuries", "D. Gunshot wounds", "E. Motor vehicle accidents"] }, answer: { en: ["A. Falls", "C. Blast injuries", "E. Motor vehicle accidents"] } },
+            { number: 15, type: "mcq", question: { en: "Section 3: 2. Causes of chest injury for penetrating trauma: (Choose correct answers)" }, options: { en: ["A. Falls", "B. Stab wounds", "C. Blast injuries", "D. Gunshot wounds", "E. Shrapnel wounds"] }, answer: { en: ["B. Stab wounds", "D. Gunshot wounds", "E. Shrapnel wounds"] } }
+        ];
+
+        let quizDataPart6 = [
+            { number: 1, type: "mcq", question: { en: "Section 3: 3. How many percentage of isolated liver injury that occurs in patients?" }, options: { en: ["A. 33%", "B. 45%", "C. 50%", "D. 60%"] }, answer: { en: ["C. 50%"] } },
+            { number: 2, type: "mcq", question: { en: "Section 3: 4. What are the Traumatic/Tension Pneumothorax? (Choose correct)" }, options: { en: ["A. Primary spontaneous pneumothorax", "B. Pulmonary source", "C. Tracheobronchial source", "D. Primary spontaneous pneumothorax (rep)", "E. Esophageal source"] }, answer: { en: ["B. Pulmonary source", "C. Tracheobronchial source", "E. Esophageal source"] } },
+            { number: 3, type: "mcq", question: { en: "Section 3: 5. What are the factors that compromise the exam of Abdominal Injury? (Choose correct)" }, options: { en: ["A. Alcohol and other drugs", "B. Scratch", "C. Injury to legs", "D. Injury to the brain, spinal cord", "E. Injury to ribs, spine, pelvis"] }, answer: { en: ["A. Alcohol and other drugs", "D. Injury to the brain, spinal cord", "E. Injury to ribs, spine, pelvis"] } },
+            { number: 4, type: "mcq", question: { en: "Section 3: 6. What are investigation methods for Abdominal Trauma stable patient? (Choose correct)" }, options: { en: ["A. Full blood count and haematocrit", "B. MCHC", "C. Enzymology", "D. Urea and Electrolytes", "E. Focused Abdominal Sonography for Trauma"] }, answer: { en: ["A. Full blood count and haematocrit", "D. Urea and Electrolytes", "E. Focused Abdominal Sonography for Trauma"] } },
+            { number: 5, type: "mcq", question: { en: "Section 3: 7. What are the disadvantages of Focused Abdominal Sonography for Trauma? (Choose correct)" }, options: { en: ["A. Operator dependent", "B. Retroperitoneal structures are not visualized", "C. Cannot assess hollow visceral perforation", "D. Non-invasive", "E. No risk from radiation"] }, answer: { en: ["A. Operator dependent", "B. Retroperitoneal structures are not visualized", "C. Cannot assess hollow visceral perforation"] } },
+            { number: 6, type: "mcq", question: { en: "Section 3: 8. What are the advantages of Focused Abdominal Sonography for Trauma? (Choose correct)" }, options: { en: ["A. Operator dependent", "B. Retroperitoneal structures are not visualized", "C. Cannot assess hollow visceral perforation", "D. Non-invasive", "E. No risk from contrast media or radiation"] }, answer: { en: ["D. Non-invasive", "E. No risk from contrast media or radiation"] } },
+            { number: 7, type: "mcq", question: { en: "Section 3: 9. What are the four view techniques of Focused Abdominal Sonography for Trauma? (Choose correct)" }, options: { en: ["A. Morrison’s pouch", "B. Douglas pouch", "C. Epigastric", "D. Right upper quadrant", "E. Left upper quadrant"] }, answer: { en: ["A. Morrison’s pouch", "B. Douglas pouch", "C. Epigastric", "E. Left upper quadrant"] } },
+            { number: 8, type: "mcq", question: { en: "Section 3: 10. Sometimes the herniated loop becomes partially obstructed, symptoms include: (Choose correct)" }, options: { en: ["A. Tenderness", "B. Abdominal distension", "C. Anorexia", "D. Irritability", "E. Strangulation and gangrene"] }, answer: { en: ["A. Tenderness", "B. Abdominal distension", "C. Anorexia", "D. Irritability"] } },
+            { number: 9, type: "mcq", question: { en: "Section 3: 12. Squamous cell carcinoma are: (Choose correct)" }, options: { en: ["A. More common in males", "B. Most occur centrally in the large bronchi", "C. Can occur in non-smokers", "D. Associated with smoking", "E. Early metastasis to kidney"] }, answer: { en: ["A. More common in males", "B. Most occur centrally in the large bronchi", "D. Associated with smoking"] } },
+            { number: 10, type: "mcq", question: { en: "Section 3: 13. There are two types of signs and symptoms of lung cancer, what are they? (Choose correct)" }, options: { en: ["A. Localized – involving the lung", "B. Localized – involved other areas throughout the body if the cancer has spread", "C. Generalized – involving the lung", "D. Generalized – involves other areas throughout the body if the cancer has spread"] }, answer: { en: ["A. Localized – involving the lung", "D. Generalized – involves other areas throughout the body if the cancer has spread"] } },
+            { number: 11, type: "mcq", question: { en: "Section 3: 14. What are the late signs and symptoms of Lung Cancer? (Choose correct)" }, options: { en: ["A. Head and neck edema", "B. Chest/shoulder pain", "C. Hemoptysis", "D. Dysphagia", "E. Dyspnea"] }, answer: { en: ["A. Head and neck edema", "D. Dysphagia"] } },
+            { number: 12, type: "mcq", question: { en: "Section 3: 15. Which ones are not signs and symptoms of the Esophageal Cancer?" }, options: { en: ["A. Dysphagia", "B. Always feel dizzy", "C. Weight loss without trying", "D. Can’t sleep at night", "E. Chest pain, pressure"] }, answer: { en: ["B. Always feel dizzy", "D. Can’t sleep at night"] } },
+            { number: 13, type: "mcq", question: { en: "Section 3: 16. Hemothorax is a type of chest wound." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 14, type: "mcq", question: { en: "Section 3: 17. What are the signs and symptoms of sucking chest wound ? (Choose correct)" }, options: { en: ["A. Difficulty breathing", "B. Normal breathing", "C. Blunt chest trauma", "D. Impaled object in chest", "E. Pain in chest or shoulder"] }, answer: { en: ["A. Difficulty breathing", "D. Impaled object in chest", "E. Pain in chest or shoulder"] } },
+            { number: 15, type: "mcq", question: { en: "Section 3: 18. What are the managements of sucking chest wound ? (Choose correct)" }, options: { en: ["A. Cover wound and tape down 3 sides", "B. Medical treatment", "C. Cover wound completely without chest tube", "D. Seal airtight, covering larger first.", "E. May use Asherman chest seal"] }, answer: { en: ["A. Cover wound and tape down 3 sides", "D. Seal airtight, covering larger first.", "E. May use Asherman chest seal"] } }
+        ];
+
+        let quizDataPart7 = [
+            { number: 1, type: "mcq", question: { en: "Section 3: 19. Stabilize object with support dessings is management of impaled object." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 2, type: "mcq", question: { en: "Section 3: 20. What are the signs and symptoms of spleen injury ?" }, options: { en: ["A. Blood pressure high", "B. Blood pressure low", "C. KEHR’s sign-pain in the left shoulder", "D. Difficult to breath", "E. Pale skin"] }, answer: { en: ["B. Blood pressure low", "C. KEHR’s sign-pain in the left shoulder", "E. Pale skin"] } },
+            { number: 3, type: "mcq", question: { en: "Section 3: 21. Squamous cell carcinoma, adenocarcinoma and large cell carcinomas are NSCLC." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 4, type: "mcq", question: { en: "Section 3: 22. Squamous cell carcinoma is considered as small cell lung cancer." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["B. False"] } },
+            { number: 5, type: "mcq", question: { en: "Section 3: 23. Adenocarcinoma is considered as small cell lung cancer." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["B. False"] } },
+            { number: 6, type: "mcq", question: { en: "Section 3: 24. Large cell carcinomas is considered as non-small cell lung cancer" }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 7, type: "mcq", question: { en: "Section 3: 25. Squamous cell carnoma is common metastasis that is slow effects the liver, adrenal glands." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 8, type: "mcq", question: { en: "Section 3: 26. What are the generalized signs and symptoms of lung cancer ?" }, options: { en: ["A. Change in phlegm", "B. Abdominal pain, elevated liver tests", "C. Pancoats syndrome", "D. Headaches, mental status changes", "E. Pleural effusion"] }, answer: { en: ["B. Abdominal pain, elevated liver tests", "D. Headaches, mental status changes"] } },
+            { number: 9, type: "mcq", question: { en: "Section 3: 27. What are the early signs and symptoms of lung cancer ?" }, options: { en: ["A. Dyspnea", "B. Chest pain/tightness", "C. Head and neck edema", "D. Burred vision, headaches", "E. Recurring respiratory"] }, answer: { en: ["A. Dyspnea", "E. Recurring respiratory"] } },
+            { number: 10, type: "mcq", question: { en: "Section 3: 28. What are the early signs and symptoms of lung cancer ?" }, options: { en: ["A. Dysphagia", "B. Hemoptysis", "C. Recurring respiratory infections", "D. Bone pain", "E. Pleural effusion"] }, answer: { en: ["B. Hemoptysis", "C. Recurring respiratory infections"] } },
+            { number: 11, type: "mcq", question: { en: "Section 3: 29. What are the side effects of chemotherapy treatments of lung cancer ?" }, options: { en: ["A. Pain", "B. Alopecia, SOB", "C. Tingling", "D. Irritable", "E. Decreased hematopoietic function"] }, answer: { en: ["B. Alopecia, SOB", "C. Tingling", "D. Irritable"] } },
+            { number: 12, type: "mcq", question: { en: "Section 3: 30. A feeling of small air pockets under the skin if the lung has been injured is a sign of lung cancer." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 13, type: "mcq", question: { en: "Section 3: 31. Inguinal hernia is a type of ventral hernia that occurs when an intra-abdominal structure protrudes." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 14, type: "mcq", question: { en: "Section 3: 32. Most hernias that are present at birth or in childhood are direct inguinal hernias." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["B. False"] } },
+            { number: 15, type: "mcq", question: { en: "Section 3: 33. Inguinal hernia repair is one of the most pediatric operations performed" }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } },
+            { number: 16, type: "mcq", question: { en: "Section 3: 34. Indirect inguinal hernias are due to patent processus vaginalis." }, options: { en: ["A. True", "B. False"] }, answer: { en: ["A. True"] } }
+        ];
+
+        let quizDataPart8 = [
+            { number: 1, type: "mcq", question: { en: "Fill in the gape: 35. An indirect inguinal hernia occurs when intestinal enter the …………….. region through a patent processus vaginalis." }, options: { en: ["A. Inguinal", "B. Umbilical", "C. Femoral", "D. Scrotal"] }, answer: { en: ["A. Inguinal"] } },
+            { number: 2, type: "mcq", question: { en: "Fill in the gape: 2. Inguinal hernia is a type of ventral hernia that occurs when b……………..or ………………., protrudes through a defect." }, options: { en: ["A. Bowel or Omentum", "B. Bladder or Stomach", "C. Liver or Kidney"] }, answer: { en: ["A. Bowel or Omentum"] } },
+            { number: 3, type: "mcq", question: { en: "7. What are the types of Abdominal Trauma? (Write the correct answers)" }, options: { en: ["A. Blunt and Penetrating", "B. Primary and Secondary", "C. Open and Closed"] }, answer: { en: ["A. Blunt and Penetrating"] } },
+            { number: 4, type: "mcq", question: { en: "Fill in the gape: 11. Unlike a hernia, the h………………… is unable to be reduced and cannot be produced by a sudden increase of pressure." }, options: { en: ["A. Hydrocele", "B. Hematocele", "C. Hematoma"] }, answer: { en: ["A. Hydrocele"] } }
+        ];
+
+        let quizData;
+        let currentPart = 1;
+        let quizState = {};
+
+        // Sound Synthesis
+        const correctSynth = new Tone.Synth().toDestination();
+        const incorrectSynth = new Tone.Synth().toDestination();
+        let audioStarted = false;
+
+        // DOM Elements
+        const partButtons = [
+            document.getElementById('part1-btn'),
+            document.getElementById('part2-btn'),
+            document.getElementById('part3-btn'),
+            document.getElementById('part4-btn'),
+            document.getElementById('part5-btn'),
+            document.getElementById('part6-btn'),
+            document.getElementById('part7-btn'),
+            document.getElementById('part8-btn')
+        ];
+        
+        const quizView = document.getElementById('quiz-view');
+        const editView = document.getElementById('edit-view');
+        const practiceSheetBtn = document.getElementById('practice-sheet-btn');
+        const practiceSheetView = document.getElementById('practice-sheet-view');
+        const showAllBtn = document.getElementById('show-all-btn');
+        const allQuestionsView = document.getElementById('all-questions-view');
+        const editQuizBtn = document.getElementById('edit-quiz-btn');
+        const applyPreviewBtn = document.getElementById('apply-preview-btn');
+        const generateSaveCodeBtn = document.getElementById('generate-save-code-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const editQuestionsContainer = document.getElementById('edit-questions-container');
+        const editQuestionNavArea = document.getElementById('edit-question-navigation');
+        const exportArea = document.getElementById('export-area');
+        const exportOutput = document.getElementById('export-output');
+        const copyFeedbackEl = document.getElementById('copy-feedback');
+
+        const mainScoreTextEl = document.getElementById('main-score-text');
+        const questionNavArea = document.getElementById('question-navigation');
+        const questionArea = document.getElementById('question-area');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const answerArea = document.getElementById('answer-area');
+        const feedbackArea = document.getElementById('feedback-area');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        const redoPartBtn = document.getElementById('redo-part-btn');
+        const resultsArea = document.getElementById('results-area');
+        const resultsScoreEl = document.getElementById('results-score');
+        const summaryEl = document.getElementById('summary');
+        const restartBtn = document.getElementById('restart-btn');
+
+        let isAnswered = false;
+
+        async function startAudio() {
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+            }
+        }
+        
+        function switchPart(part) {
+            currentPart = part;
+
+            partButtons.forEach((btn, idx) => {
+                if (idx === part - 1) {
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                    btn.classList.remove('bg-white', 'text-gray-900');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-900');
+                }
+            });
+            
+            const datasets = [quizDataPart1, quizDataPart2, quizDataPart3, quizDataPart4, quizDataPart5, quizDataPart6, quizDataPart7, quizDataPart8];
+            quizData = datasets[part-1];
+            
+            document.getElementById('quiz-subtitle').textContent = `Prof: Yok Ratan (${quizData.length} questions)`;
+            loadQuizView();
+        }
+
+        function updateScoreText() {
+            mainScoreTextEl.innerHTML = `Score: ${quizState[currentPart].score} / ${quizData.length}`;
+        }
+
+        function initializeQuiz() {
+            quizState = {};
+            for(let i=1; i<=8; i++) {
+                quizState[i] = { userAnswers: [], score: 0, currentQuestionIndex: 0 };
+            }
+            switchPart(currentPart); 
+        }
+        
+        function loadQuizView() {
+            quizView.classList.remove('hidden');
+            editView.classList.add('hidden');
+            practiceSheetView.classList.add('hidden');
+            allQuestionsView.classList.add('hidden');
+            
+            questionNavArea.classList.remove('hidden');
+            questionArea.classList.remove('hidden');
+            answerArea.classList.remove('hidden');
+            resultsArea.classList.add('hidden');
+
+            renderQuestionButtons();
+            showQuestion();
+            updateScoreText();
+        }
+
+        function renderQuestionButtons() {
+            questionNavArea.innerHTML = '';
+            quizData.forEach((question, index) => {
+                const button = document.createElement('button');
+                button.textContent = index + 1;
+                button.classList.add('question-nav-btn', 'border-2', 'border-gray-300', 'rounded-md');
+                button.addEventListener('click', () => {
+                    quizState[currentPart].currentQuestionIndex = index;
+                    showQuestion();
+                });
+                questionNavArea.appendChild(button);
+            });
+        }
+        
+        function updateQuestionButtonStyles() {
+            const buttons = Array.from(questionNavArea.children);
+            buttons.forEach((button, index) => {
+                button.classList.remove('active', 'answered-correct', 'answered-incorrect');
+                if (quizState[currentPart].userAnswers[index]) {
+                    if(quizState[currentPart].userAnswers[index].isCorrect) {
+                        button.classList.add('answered-correct');
+                    } else {
+                        button.classList.add('answered-incorrect');
+                    }
+                }
+            });
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            if(buttons[currentQuestionIndex]) {
+                buttons[currentQuestionIndex].classList.add('active');
+            }
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            const userAnswers = quizState[currentPart].userAnswers;
+            const currentQuestion = quizData[currentQuestionIndex];
+            isAnswered = userAnswers[currentQuestionIndex] !== undefined;
+
+            if (isAnswered) redoBtn.classList.remove('hidden');
+
+            questionNumberEl.innerHTML = `Question ${currentQuestionIndex + 1}/${quizData.length}`;
+            questionTextEl.innerHTML = currentQuestion.question.en;
+            
+            answerArea.className = 'flex flex-col gap-4';
+            const optionsGrid = document.createElement('div');
+            optionsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 w-full';
+            
+            const correctAnswers = Array.isArray(currentQuestion.answer.en) ? currentQuestion.answer.en.map(a=>a.trim()) : [currentQuestion.answer.en.trim()];
+            
+            currentQuestion.options.en.forEach((optionEn) => {
+                const button = document.createElement('button');
+                button.innerHTML = `<span>${optionEn}</span>`;
+                button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'text-left', 'hover:bg-gray-100');
+                
+                button.addEventListener('click', () => {
+                    if (isAnswered) return;
+                    button.classList.toggle('selected');
+                    const selectedButtons = Array.from(optionsGrid.querySelectorAll('button.selected'));
+                    if (selectedButtons.length === correctAnswers.length) {
+                        checkMcqAnswer(currentQuestionIndex, optionsGrid, feedbackArea);
+                    }
+                });
+
+                if(isAnswered) {
+                    button.disabled = true;
+                    const userAnswerData = userAnswers[currentQuestionIndex];
+                    const isThisCorrectOption = correctAnswers.includes(optionEn.trim());
+                    const wasSelected = userAnswerData.answers && userAnswerData.answers.includes(optionEn.trim());
+                    if (isThisCorrectOption) button.classList.add('correct');
+                    else if (wasSelected) button.classList.add('incorrect');
+                }
+                optionsGrid.appendChild(button);
+            });
+            answerArea.appendChild(optionsGrid);
+            updateQuestionButtonStyles();
+            updateButtonVisibility();
+        }
+        
+        function resetState() {
+            feedbackArea.textContent = '';
+            answerArea.innerHTML = '';
+            redoBtn.classList.add('hidden');
+        }
+
+        function updateButtonVisibility() {
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+            const allAnswered = quizState[currentPart].userAnswers.filter(Boolean).length === quizData.length;
+            nextBtn.classList.toggle('hidden', allAnswered);
+            if (currentQuestionIndex === quizData.length - 1 || allAnswered) {
+                 nextBtn.innerHTML = `<span class="font-semibold">Show Results</span>`;
+            } else {
+                 nextBtn.innerHTML = `<span class="font-semibold">Next Question</span>`;
+            }
+        }
+
+        async function checkMcqAnswer(questionIndex, optionsContainer, feedbackEl) {
+            await startAudio();
+            if (quizState[currentPart].userAnswers[questionIndex]) return;
+
+            const selectedButtons = Array.from(optionsContainer.querySelectorAll('button.selected'));
+            const selectedTexts = selectedButtons.map(btn => btn.querySelector('span').textContent.trim());
+            const currentQuestion = quizData[questionIndex];
+            const correctAnswers = Array.isArray(currentQuestion.answer.en) ? currentQuestion.answer.en.map(a => a.trim()) : [currentQuestion.answer.en.trim()];
+
+            const isCorrect = selectedTexts.length === correctAnswers.length && selectedTexts.every(val => correctAnswers.includes(val));
+
+            if (isCorrect) {
+                quizState[currentPart].score++;
+                correctSynth.triggerAttackRelease("C5", "8n", Tone.now());
+                if (feedbackEl) {
+                    feedbackEl.innerHTML = `Correct!`;
+                    feedbackEl.className = 'mt-2 text-center text-md font-medium text-green-600 practice-feedback';
+                }
+            } else {
+                const now = Tone.now();
+                incorrectSynth.triggerAttackRelease("G3", "16n", now);
+                incorrectSynth.triggerAttackRelease("F#3", "8n", now + 0.1);
+                if (feedbackEl) {
+                    feedbackEl.innerHTML = `Wrong! Correct answer: <strong>${correctAnswers.join(', ')}</strong>`;
+                    feedbackEl.className = 'mt-2 text-center text-sm font-medium text-red-600 practice-feedback';
+                }
+            }
+
+            const allButtons = optionsContainer.querySelectorAll('button.option-btn');
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('selected', 'hover:bg-gray-100');
+                const btnText = btn.querySelector('span').textContent.trim();
+                if (correctAnswers.includes(btnText)) btn.classList.add('correct');
+                else if (selectedTexts.includes(btnText)) btn.classList.add('incorrect');
+            });
+
+            quizState[currentPart].userAnswers[questionIndex] = { isCorrect, answers: selectedTexts };
+            if (!practiceSheetView.classList.contains('hidden')) {
+                document.getElementById(`ps-redo-btn-${questionIndex}`).classList.remove('hidden');
+            } else redoBtn.classList.remove('hidden');
+            
+            updateScoreText();
+            updateQuestionButtonStyles();
+            updateButtonVisibility();
+        }
+        
+        function renderPracticeSheet() {
+            practiceSheetView.innerHTML = ''; 
+            const title = document.createElement('h2');
+            title.className = 'text-3xl font-bold text-center mb-6 text-gray-800';
+            title.textContent = `Practice Sheet - Part ${currentPart}`;
+            practiceSheetView.appendChild(title);
+
+            quizData.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.id = `ps-question-${index}`;
+                questionDiv.className = 'mb-6 p-4 border rounded-lg bg-gray-50';
+                
+                const questionHeader = document.createElement('div');
+                questionHeader.className = 'flex justify-between items-start gap-4 mb-4';
+                
+                const questionTitle = document.createElement('p');
+                questionTitle.className = 'font-bold text-lg text-gray-900 flex-grow';
+                questionTitle.innerHTML = q.question.en;
+                
+                const prRedoBtn = document.createElement('button');
+                prRedoBtn.id = `ps-redo-btn-${index}`;
+                prRedoBtn.textContent = 'Redo';
+                prRedoBtn.className = 'hidden bg-yellow-500 text-white font-bold py-1 px-4 rounded-lg hover:bg-yellow-600 text-sm shrink-0';
+                prRedoBtn.addEventListener('click', () => redoPracticeSheetQuestion(index));
+                
+                questionHeader.appendChild(questionTitle);
+                questionHeader.appendChild(prRedoBtn);
+                questionDiv.appendChild(questionHeader);
+
+                const answersContainer = document.createElement('div');
+                const feedbackEl = document.createElement('div');
+                feedbackEl.className = 'practice-feedback mt-2';
+
+                const optionsGrid = document.createElement('div');
+                optionsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
+                const correctAnswers = Array.isArray(q.answer.en) ? q.answer.en.map(a=>a.trim()) : [q.answer.en.trim()];
+
+                q.options.en.forEach(optionEn => {
+                    const button = document.createElement('button');
+                    button.innerHTML = `<span>${optionEn}</span>`;
+                    button.className = 'option-btn w-full p-3 border-2 border-gray-300 rounded-lg text-left hover:bg-gray-100 bg-white';
+                    button.addEventListener('click', () => {
+                        if (!quizState[currentPart].userAnswers[index]) {
+                            button.classList.toggle('selected');
+                            const selectedButtons = Array.from(optionsGrid.querySelectorAll('button.selected'));
+                            if (selectedButtons.length === correctAnswers.length) checkMcqAnswer(index, optionsGrid, feedbackEl);
+                        }
+                    });
+                    optionsGrid.appendChild(button);
+                });
+                
+                answersContainer.appendChild(optionsGrid);
+                questionDiv.appendChild(answersContainer);
+                questionDiv.appendChild(feedbackEl);
+                practiceSheetView.appendChild(questionDiv);
+
+                if (quizState[currentPart].userAnswers[index]) {
+                    prRedoBtn.classList.remove('hidden');
+                    const userAnswerData = quizState[currentPart].userAnswers[index];
+                    const buttons = optionsGrid.querySelectorAll('.option-btn');
+                    buttons.forEach(button => {
+                        button.disabled = true;
+                        button.classList.remove('selected', 'hover:bg-gray-100');
+                        const optionText = button.querySelector('span').textContent.trim();
+                        if (correctAnswers.includes(optionText)) button.classList.add('correct');
+                        else if (userAnswerData.answers && userAnswerData.answers.includes(optionText)) button.classList.add('incorrect');
+                    });
+                }
+            });
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg block mx-auto';
+            backBtn.innerHTML = '<span class="font-semibold">Back to Quiz</span>';
+            backBtn.addEventListener('click', togglePracticeSheetView);
+            practiceSheetView.appendChild(backBtn);
+        }
+
+        function togglePracticeSheetView() {
+            const isHiding = !practiceSheetView.classList.contains('hidden');
+            if (isHiding) {
+                practiceSheetView.classList.add('hidden');
+                quizView.classList.remove('hidden');
+                practiceSheetBtn.textContent = 'Practice Sheet';
+                showQuestion();
+            } else {
+                quizView.classList.add('hidden');
+                practiceSheetView.classList.remove('hidden');
+                allQuestionsView.classList.add('hidden');
+                practiceSheetBtn.textContent = 'Back to Quiz';
+                renderPracticeSheet();
+            }
+        }
+
+        function redoPracticeSheetQuestion(questionIndex) {
+            const answerData = quizState[currentPart].userAnswers[questionIndex];
+            if (!answerData) return;
+            if (answerData.isCorrect) quizState[currentPart].score--;
+            quizState[currentPart].userAnswers[questionIndex] = undefined;
+            updateScoreText();
+            updateQuestionButtonStyles();
+            const container = document.getElementById(`ps-question-${questionIndex}`);
+            const buttons = container.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('correct', 'incorrect', 'selected');
+                btn.classList.add('hover:bg-gray-100');
+            });
+            container.querySelector('.practice-feedback').innerHTML = '';
+            document.getElementById(`ps-redo-btn-${questionIndex}`).classList.add('hidden');
+        }
+
+        function toggleAllQuestionsView() {
+            const isHiding = !allQuestionsView.classList.contains('hidden');
+            if (isHiding) {
+                allQuestionsView.classList.add('hidden');
+                quizView.classList.remove('hidden');
+                showAllBtn.textContent = 'Show Answers';
+            } else {
+                quizView.classList.add('hidden');
+                practiceSheetView.classList.add('hidden');
+                allQuestionsView.classList.remove('hidden');
+                showAllBtn.textContent = 'Back to Quiz';
+                renderAllQuestions();
+            }
+        }
+
+        function renderAllQuestions() {
+            allQuestionsView.innerHTML = ''; 
+            const title = document.createElement('h2');
+            title.className = 'text-3xl font-bold text-center mb-6 text-gray-800';
+            title.textContent = `All Questions & Answers - Part ${currentPart}`;
+            allQuestionsView.appendChild(title);
+
+            quizData.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'mb-6 p-4 border rounded-lg bg-gray-50';
+                let contentHTML = `<p class="font-bold text-lg mb-2">${q.question.en}</p>`;
+                contentHTML += '<ul class="list-disc list-inside space-y-1">';
+                const correctAnswers = Array.isArray(q.answer.en) ? q.answer.en.map(a=>a.trim()) : [q.answer.en.trim()];
+                q.options.en.forEach(option => {
+                    const isCorrect = correctAnswers.includes(option.trim());
+                    contentHTML += `<li class="${isCorrect ? 'text-green-700 font-semibold' : 'text-gray-700'}">${option}${isCorrect ? ' &check;' : ''}</li>`;
+                });
+                contentHTML += '</ul>';
+                questionDiv.innerHTML = contentHTML;
+                allQuestionsView.appendChild(questionDiv);
+            });
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg block mx-auto';
+            backBtn.innerHTML = 'Back to Quiz';
+            backBtn.addEventListener('click', toggleAllQuestionsView);
+            allQuestionsView.appendChild(backBtn);
+        }
+
+        function showResults() {
+            questionNavArea.classList.add('hidden');
+            questionArea.classList.add('hidden');
+            answerArea.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            prevBtn.classList.add('hidden');
+            redoBtn.classList.add('hidden');
+            resultsArea.classList.remove('hidden');
+            resultsScoreEl.innerHTML = `Your final score is ${quizState[currentPart].score} out of ${quizData.length}.`;
+            summaryEl.innerHTML = `<div class="text-center mb-4"><h3 class="text-xl font-bold text-gray-700">Review Your Answers:</h3></div>`; 
+            
+            quizState[currentPart].userAnswers.forEach((ua, index) => {
+                if (!ua) return;
+                const qData = quizData[index];
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('mb-4', 'p-3', 'rounded-md', ua.isCorrect ? 'bg-blue-100' : 'bg-red-100');
+                const correctAnswerText = Array.isArray(qData.answer.en) ? qData.answer.en.join(', ') : qData.answer.en;
+                resultDiv.innerHTML = `<p class="font-semibold">${qData.question.en}</p>
+                    <p class="text-sm mt-2 ${ua.isCorrect ? 'text-blue-700' : 'text-red-700'}">Your answer: ${ua.answers.join(', ')}</p>
+                    ${!ua.isCorrect ? `<p class="text-sm text-gray-600">Correct: ${correctAnswerText}</p>` : ''}`;
+                summaryEl.appendChild(resultDiv);
+            });
+        }
+
+        function redoQuestion() {
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            const answerData = quizState[currentPart].userAnswers[currentQuestionIndex];
+            if (!answerData) return;
+            if (answerData.isCorrect) quizState[currentPart].score--;
+            quizState[currentPart].userAnswers[currentQuestionIndex] = undefined;
+            updateScoreText();
+            showQuestion();
+        }
+
+        function redoPart() {
+            quizState[currentPart] = { userAnswers: [], score: 0, currentQuestionIndex: 0 };
+            loadQuizView();
+        }
+
+        function toggleEditMode() {
+            quizView.classList.toggle('hidden');
+            editView.classList.toggle('hidden');
+            if (!editView.classList.contains('hidden')) renderEditView();
+        }
+
+        function renderEditView() {
+            editQuestionsContainer.innerHTML = '';
+            editQuestionNavArea.innerHTML = '';
+            quizData.forEach((q, index) => {
+                const navButton = document.createElement('button');
+                navButton.textContent = index + 1;
+                navButton.className = 'question-nav-btn border-2 border-gray-300 rounded-md';
+                navButton.addEventListener('click', () => document.getElementById(`edit-q-${index}`).scrollIntoView({ behavior: 'smooth' }));
+                editQuestionNavArea.appendChild(navButton);
+                
+                const qDiv = document.createElement('div');
+                qDiv.id = `edit-q-${index}`;
+                qDiv.className = 'border p-4 rounded-lg mb-4 bg-gray-50 scroll-mt-4';
+                qDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-bold">Question ${index + 1}</p>
+                        <button class="bg-red-500 text-white px-3 py-1 rounded" onclick="quizData.splice(${index}, 1); renderEditView();">Delete</button>
+                    </div>
+                    <textarea class="edit-input w-full p-2 border rounded" id="edit-text-${index}">${q.question.en}</textarea>
+                    <div class="mt-2 space-y-2">
+                        ${q.options.en.map((opt, oIdx) => `
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="check-${index}-${oIdx}" ${q.answer.en.includes(opt) ? 'checked' : ''}>
+                                <input type="text" class="w-full p-1 border rounded" id="opt-${index}-${oIdx}" value="${opt}">
+                            </div>
+                        `).join('')}
+                    </div>`;
+                editQuestionsContainer.appendChild(qDiv);
+            });
+        }
+
+        function applyToPreview() {
+            const newQuestions = [];
+            editQuestionsContainer.querySelectorAll('.border').forEach((div, idx) => {
+                const qText = div.querySelector('textarea').value;
+                const opts = [];
+                const ans = [];
+                const textInputs = div.querySelectorAll('input[type="text"]');
+                textInputs.forEach((input, iIdx) => {
+                    const optVal = input.value;
+                    if(optVal) {
+                        opts.push(optVal);
+                        if(document.getElementById(`check-${idx}-${iIdx}`).checked) ans.push(optVal);
+                    }
+                });
+                newQuestions.push({ number: idx+1, type: 'mcq', question: {en: qText}, options: {en: opts}, answer: {en: ans}});
+            });
+            const datasets = [quizDataPart1, quizDataPart2, quizDataPart3, quizDataPart4, quizDataPart5, quizDataPart6, quizDataPart7, quizDataPart8];
+            datasets[currentPart-1] = newQuestions;
+            quizData = newQuestions;
+            toggleEditMode();
+            initializeQuiz();
+        }
+
+        function generateSaveCode() {
+            const varName = `quizDataPart${currentPart}`;
+            exportOutput.value = `let ${varName} = ${JSON.stringify(quizData, null, 4)};`;
+            exportArea.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        partButtons.forEach((btn, idx) => btn.addEventListener('click', () => switchPart(idx + 1)));
+        practiceSheetBtn.addEventListener('click', togglePracticeSheetView);
+        showAllBtn.addEventListener('click', toggleAllQuestionsView);
+        prevBtn.addEventListener('click', () => {
+            if (quizState[currentPart].currentQuestionIndex > 0) {
+                quizState[currentPart].currentQuestionIndex--;
+                showQuestion();
+            }
+        });
+        nextBtn.addEventListener('click', () => {
+            const allAnswered = quizState[currentPart].userAnswers.filter(Boolean).length === quizData.length;
+            if (quizState[currentPart].currentQuestionIndex < quizData.length - 1 && !allAnswered) {
+                quizState[currentPart].currentQuestionIndex++;
+                showQuestion();
+            } else showResults();
+        });
+        restartBtn.addEventListener('click', initializeQuiz);
+        redoBtn.addEventListener('click', redoQuestion);
+        redoPartBtn.addEventListener('click', redoPart);
+        editQuizBtn.addEventListener('click', toggleEditMode);
+        applyPreviewBtn.addEventListener('click', applyToPreview);
+        generateSaveCodeBtn.addEventListener('click', generateSaveCode);
+        cancelEditBtn.addEventListener('click', toggleEditMode);
+        exportOutput.addEventListener('click', () => {
+            exportOutput.select();
+            document.execCommand('copy');
+            copyFeedbackEl.textContent = 'Code copied!';
+            setTimeout(() => { copyFeedbackEl.textContent = '' }, 2000);
+        });
+
+        initializeQuiz();
+    </script>
+</body>
+</html>
